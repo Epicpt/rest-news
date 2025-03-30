@@ -4,6 +4,7 @@ package app
 
 import (
 	"errors"
+	"flag"
 	"log"
 	"os"
 
@@ -20,6 +21,10 @@ func init() {
 		log.Println("Файл .env не найден")
 	}
 
+	// Определяем флаг -direction (по умолчанию "up")
+	direction := flag.String("direction", "up", "Migration direction: up or down")
+	flag.Parse()
+
 	databaseURL, ok := os.LookupEnv("PG_URL")
 	if !ok || len(databaseURL) == 0 {
 		log.Fatalf("migrate: environment variable not declared: PG_URL")
@@ -31,17 +36,20 @@ func init() {
 	if err != nil {
 		log.Fatalf("migrate: failed to initialize: %s", err)
 	}
-
-	err = m.Up()
 	defer m.Close()
+
+	switch *direction {
+	case "up":
+		err = m.Up()
+	case "down":
+		err = m.Down()
+	default:
+		log.Fatalf("Invalid migration direction: %s", *direction)
+	}
+
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		log.Fatalf("Migrate: up error: %s", err)
+		log.Fatalf("Migrate: %s error: %s", *direction, err)
 	}
 
-	if errors.Is(err, migrate.ErrNoChange) {
-		log.Printf("Migrate: no change")
-		return
-	}
-
-	log.Printf("Migrate: up success")
+	log.Printf("Migrate: %s success", *direction)
 }

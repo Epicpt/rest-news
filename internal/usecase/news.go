@@ -20,8 +20,8 @@ func (uc *UseCase) EditNews(news entity.News) error {
 	return nil
 }
 
-func (uc *UseCase) GetNewList() ([]entity.News, error) {
-	newsList, err := uc.repo.GetNewsList()
+func (uc *UseCase) GetNewList(page, limit int) ([]entity.News, error) {
+	newsList, err := uc.repo.GetNewsList(page, limit)
 	if err != nil {
 		return nil, err
 	}

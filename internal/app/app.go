@@ -4,12 +4,13 @@ import (
 	"os"
 	"os/signal"
 	"rest-news/config"
+	"rest-news/internal/controller"
+	"rest-news/internal/repository"
+	"rest-news/internal/usecase"
 	"rest-news/pkg/httpserver"
 	"rest-news/pkg/logger"
 	"rest-news/pkg/postgres"
 	"syscall"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 func Run(cfg *config.Config) {
@@ -26,15 +27,12 @@ func Run(cfg *config.Config) {
 	l.Info().Msg("PostgreSQL initialized")
 
 	// Use case
-	// ...
+	newsUseCase := usecase.NewUseCase(repository.New(pg))
 
 	// Run server
 	httpServer := httpserver.New(cfg.Port)
 
-	// Routes
-	httpServer.App.Get("/ping", func(c *fiber.Ctx) error {
-		return c.SendString("pong")
-	})
+	controller.NewNewsRoutes(httpServer.App, *newsUseCase, l)
 
 	httpServer.Start()
 
