@@ -28,6 +28,7 @@ type PG struct {
 }
 
 func NewConfig() (*Config, error) {
+	// Для локального запуска
 	if err := godotenv.Load("../.env"); err != nil {
 		log.Println("Файл .env не найден")
 	}

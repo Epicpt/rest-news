@@ -1,0 +1,47 @@
+
+services:
+  rest-news:
+    container_name: news_container
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: 
+      - .env
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    restart: always
+
+  goose:
+    image: golang:1.24.1-alpine
+    container_name: goose_container
+    build:
+      context: .
+      dockerfile: Dockerfile.goose
+    env_file: 
+      - .env
+    environment:
+      - PG_URL=${PG_URL}
+    command: ["sh", "-c", "echo $PG_URL && goose -dir /migrations postgres $PG_URL up"]
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      - postgres
+    
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    env_file: 
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+volumes:
+  postgres_data:
