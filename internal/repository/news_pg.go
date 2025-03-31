@@ -5,21 +5,7 @@ import (
 	"fmt"
 
 	"rest-news/internal/entity"
-	"rest-news/pkg/postgres"
 )
-
-type Repository interface {
-	UpdateNews(entity.News) error
-	GetNewsList(int, int) ([]entity.News, error)
-}
-
-type NewsRepo struct {
-	*postgres.Postgres
-}
-
-func New(pg *postgres.Postgres) *NewsRepo {
-	return &NewsRepo{pg}
-}
 
 func (r *NewsRepo) UpdateNews(news entity.News) error {
 	ctx := context.Background()

@@ -1,17 +1,5 @@
--- Структура таблицы `News`
-CREATE TABLE IF NOT EXISTS "News" (
-  "Id" BIGSERIAL PRIMARY KEY,
-  "Title" TEXT NOT NULL,
-  "Content" TEXT NOT NULL
-);
-
--- Структура таблицы `NewsCategories`
-CREATE TABLE IF NOT EXISTS "NewsCategories" (
-  "NewsId" BIGINT NOT NULL,
-  "CategoryId" BIGINT NOT NULL,
-  PRIMARY KEY ("NewsId", "CategoryId")
-);
-
+-- +goose Up
+-- +goose StatementBegin
 -- Наполняем таблицу News
 INSERT INTO "News" ("Title", "Content") VALUES
 ('Breaking News', 'This is the latest breaking news content.'),
@@ -29,3 +17,9 @@ INSERT INTO "NewsCategories" ("NewsId", "CategoryId") VALUES
 (3, 4),
 (4, 2),
 (5, 5);
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+DELETE FROM "News" WHERE "Title" IN ('Breaking News', 'Tech Trends', 'Sports Update', 'Economy Insights', 'Health Tips');
+-- +goose StatementEnd

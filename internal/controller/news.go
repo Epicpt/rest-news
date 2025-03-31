@@ -1,25 +1,10 @@
 package controller
 
 import (
-	"rest-news/internal/controller/middleware"
 	"rest-news/internal/entity"
-	"rest-news/internal/usecase"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog"
 )
-
-type newsRoutes struct {
-	u usecase.UseCase
-	l zerolog.Logger
-}
-
-func NewNewsRoutes(router fiber.Router, u usecase.UseCase, l zerolog.Logger) {
-	r := &newsRoutes{u, l}
-
-	router.Get("/list", middleware.Pagination, r.getNewsList)
-	router.Post("/edit/:Id", r.editNews)
-}
 
 func (r *newsRoutes) getNewsList(c *fiber.Ctx) error {
 	page := c.Locals("page").(int)
