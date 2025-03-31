@@ -27,7 +27,6 @@ func Auth(c *fiber.Ctx) error {
 
 	tokenString := parts[1]
 
-	// Парсим и проверяем токен
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		// Проверяем метод подписи
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -48,12 +47,8 @@ func Auth(c *fiber.Ctx) error {
 		})
 	}
 
-	// Если токен валиден, добавляем в контекст информацию о пользователе (например, user_id)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// Можно получить данные из payload, например, user_id
 		userID := claims["id"].(float64)
-
-		// Добавляем в контекст
 		c.Locals("id", userID)
 	} else {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -61,6 +56,5 @@ func Auth(c *fiber.Ctx) error {
 		})
 	}
 
-	// Если все проверки прошли, продолжаем выполнение запроса
 	return c.Next()
 }
